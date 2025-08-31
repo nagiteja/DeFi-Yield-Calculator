@@ -1,5 +1,5 @@
 // Tab switching functionality
-function showTab(tabName) {
+function showTab(tabName, event) {
     // Hide all tab contents
     const tabContents = document.querySelectorAll('.tab-content');
     tabContents.forEach(content => content.classList.remove('active'));
@@ -12,7 +12,9 @@ function showTab(tabName) {
     document.getElementById(tabName).classList.add('active');
     
     // Add active class to clicked button
-    event.target.classList.add('active');
+    if (event && event.target) {
+        event.target.classList.add('active');
+    }
 }
 
 // Initialize range input displays
@@ -374,25 +376,38 @@ let autoRefreshActive = false;
 
 // Initialize the application
 document.addEventListener('DOMContentLoaded', function() {
-    loadSampleData();
+    console.log('🚀 DOM Content Loaded - Initializing DeFi Calculator');
     
-    // Initialize market data manager with error handling
     try {
-        if (typeof MarketDataManager !== 'undefined') {
-            marketDataManager = new MarketDataManager();
-            console.log('✅ Market Data Manager initialized successfully');
-        } else {
-            console.error('❌ MarketDataManager class not found');
-            console.log('Available global objects:', Object.keys(window).filter(key => key.includes('Market')));
+        loadSampleData();
+        
+        // Initialize market data manager with error handling
+        try {
+            if (typeof MarketDataManager !== 'undefined') {
+                marketDataManager = new MarketDataManager();
+                console.log('✅ Market Data Manager initialized successfully');
+            } else {
+                console.error('❌ MarketDataManager class not found');
+                console.log('Available global objects:', Object.keys(window).filter(key => key.includes('Market')));
+            }
+        } catch (error) {
+            console.error('❌ Failed to initialize Market Data Manager:', error);
         }
+        
+        // Test tab functionality
+        console.log('🔍 Testing tab functionality...');
+        const tabs = document.querySelectorAll('.tab-btn');
+        const tabContents = document.querySelectorAll('.tab-content');
+        console.log(`Found ${tabs.length} tab buttons and ${tabContents.length} tab contents`);
+        
+        // Add some helpful tooltips or info
+        console.log('💡 Tip: Use the Yield Calculator to estimate returns from Uniswap LP + Aave staking');
+        console.log('💡 Tip: Use the IL Simulator to understand impermanent loss risks at different price levels');
+        console.log('💡 Tip: Use the Market Data tab to get real-time DeFi rates and prices');
+        
     } catch (error) {
-        console.error('❌ Failed to initialize Market Data Manager:', error);
+        console.error('❌ Error during initialization:', error);
     }
-    
-    // Add some helpful tooltips or info
-    console.log('💡 Tip: Use the Yield Calculator to estimate returns from Uniswap LP + Aave staking');
-    console.log('💡 Tip: Use the IL Simulator to understand impermanent loss risks at different price levels');
-    console.log('💡 Tip: Use the Market Data tab to get real-time DeFi rates and prices');
 });
 
 // Market Data Functions
