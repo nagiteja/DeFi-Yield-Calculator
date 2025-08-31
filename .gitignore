@@ -63,3 +63,8 @@ Thumbs.db
 
 # Railway specific
 .railway/
+
+# Test files
+test-*.html
+*.test.js
+test/
