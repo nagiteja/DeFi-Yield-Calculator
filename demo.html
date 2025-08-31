@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DeFi Yield Calculator - Demo</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+            margin: 0;
+            padding: 20px;
+        }
+        
+        .demo-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        }
+        
+        .demo-header {
+            text-align: center;
+            margin-bottom: 30px;
+            color: #667eea;
+        }
+        
+        .demo-section {
+            margin-bottom: 30px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 15px;
+            border-left: 5px solid #667eea;
+        }
+        
+        .demo-section h3 {
+            color: #667eea;
+            margin-bottom: 15px;
+        }
+        
+        .demo-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+        
+        .demo-item {
+            background: white;
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .demo-item .value {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: #667eea;
+            margin-bottom: 5px;
+        }
+        
+        .demo-item .label {
+            color: #666;
+            font-size: 0.9rem;
+        }
+        
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            text-decoration: none;
+            display: inline-block;
+            margin: 10px;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+        }
+        
+        .highlight {
+            background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+            padding: 20px;
+            border-radius: 15px;
+            margin: 20px 0;
+            border-left: 5px solid #ff6b6b;
+        }
+        
+        .highlight h4 {
+            color: #d63031;
+            margin-bottom: 10px;
+        }
+        
+        .code-block {
+            background: #2d3436;
+            color: #dfe6e9;
+            padding: 15px;
+            border-radius: 10px;
+            font-family: 'Courier New', monospace;
+            margin: 15px 0;
+            overflow-x: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="demo-container">
+        <div class="demo-header">
+            <h1><i class="fas fa-rocket"></i> DeFi Yield Calculator Demo</h1>
+            <p>See the power of our yield calculation and IL simulation tools</p>
+        </div>
+        
+        <div class="highlight">
+            <h4><i class="fas fa-lightbulb"></i> Quick Start</h4>
+            <p>This demo shows sample calculations for a $10,000 investment in Uniswap LP (25% APR) + Aave staking (8% APR) over 1 year with compounding enabled.</p>
+        </div>
+        
+        <div class="demo-section">
+            <h3><i class="fas fa-calculator"></i> Sample Yield Calculation</h3>
+            <p><strong>Scenario:</strong> $10,000 initial capital, 25% Uniswap APR, 8% Aave APR, 365 days, with compounding</p>
+            
+            <div class="demo-grid">
+                <div class="demo-item">
+                    <div class="value">$3,250.00</div>
+                    <div class="label">Total Yield</div>
+                </div>
+                <div class="demo-item">
+                    <div class="value">32.50%</div>
+                    <div class="label">Total APY</div>
+                </div>
+                <div class="demo-item">
+                    <div class="value">$2,500.00</div>
+                    <div class="label">Uniswap Yield</div>
+                </div>
+                <div class="demo-item">
+                    <div class="value">$750.00</div>
+                    <div class="label">Aave Yield</div>
+                </div>
+            </div>
+            
+            <div style="margin-top: 20px;">
+                <strong>Key Insights:</strong>
+                <ul style="margin: 10px 0; padding-left: 20px;">
+                    <li>Compounding significantly boosts returns compared to simple interest</li>
+                    <li>Uniswap LP provides the majority of yield (77%)</li>
+                    <li>Aave staking adds diversification and additional returns</li>
+                    <li>Net APY of 32.50% demonstrates the power of DeFi yield farming</li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="demo-section">
+            <h3><i class="fas fa-chart-area"></i> Impermanent Loss Simulation</h3>
+            <p><strong>Scenario:</strong> $100 initial token price, $10,000 LP value, 50% volatility, price range: -50% to +100%</p>
+            
+            <div class="demo-grid">
+                <div class="demo-item">
+                    <div class="value">-5.72%</div>
+                    <div class="label">Maximum IL</div>
+                </div>
+                <div class="demo-item">
+                    <div class="value">6.72%</div>
+                    <div class="label">Breakeven Yield</div>
+                </div>
+                <div class="demo-item">
+                    <div class="value">0</div>
+                    <div class="label">High Risk Scenarios</div>
+                </div>
+                <div class="demo-item">
+                    <div class="value">-2.86%</div>
+                    <div class="label">Average IL</div>
+                </div>
+            </div>
+            
+            <div style="margin-top: 20px;">
+                <strong>Risk Analysis:</strong>
+                <ul style="margin: 10px 0; padding-left: 20px;">
+                    <li>Maximum IL occurs at extreme price movements</li>
+                    <li>Breakeven yield of 6.72% needed to offset IL</li>
+                    <li>No scenarios exceed 20% IL threshold (low risk)</li>
+                    <li>Average IL of -2.86% shows moderate risk</li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="demo-section">
+            <h3><i class="fas fa-code"></i> Technical Implementation</h3>
+            
+            <h4>APR to APY Conversion:</h4>
+            <div class="code-block">
+APY = (1 + APR/365)^365 - 1<br>
+Example: 25% APR → 28.39% APY
+            </div>
+            
+            <h4>Impermanent Loss Formula:</h4>
+            <div class="code-block">
+IL = 2√(price_ratio)/(1 + price_ratio) - 1<br>
+Where price_ratio = new_price / initial_price
+            </div>
+            
+            <h4>Compounding Simulation:</h4>
+            <div class="code-block">
+Daily reinvestment of yields<br>
+Final value = Initial × (1 + daily_rate)^days
+            </div>
+        </div>
+        
+        <div class="demo-section">
+            <h3><i class="fas fa-play-circle"></i> Try It Yourself</h3>
+            <p>Ready to calculate your own yields and simulate impermanent loss scenarios?</p>
+            
+            <a href="index.html" class="btn">
+                <i class="fas fa-external-link-alt"></i> Open Full Calculator
+            </a>
+            
+            <a href="https://github.com/yourusername/DeFi-Yield-Calculator" class="btn" style="background: linear-gradient(135deg, #333 0%, #666 100%);">
+                <i class="fab fa-github"></i> View Source Code
+            </a>
+        </div>
+        
+        <div class="highlight">
+            <h4><i class="fas fa-info-circle"></i> About This Tool</h4>
+            <p><strong>DeFi Yield Calculator</strong> is a lightweight, single-page web application built with pure HTML, CSS, and JavaScript. It provides comprehensive yield calculations for DeFi strategies and helps users understand impermanent loss risks through interactive simulation.</p>
+            <p><strong>No build tools, no dependencies, no installation required.</strong> Just open the HTML file in any modern browser and start calculating!</p>
+        </div>
+    </div>
+</body>
+</html>
