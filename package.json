@@ -1,0 +1,32 @@
+{
+  "name": "defi-yield-calculator",
+  "version": "1.0.0",
+  "description": "DeFi Yield Calculator with Impermanent Loss simulation and real-time market data",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "nodemon server.js"
+  },
+  "keywords": [
+    "defi",
+    "yield",
+    "calculator",
+    "impermanent-loss",
+    "uniswap",
+    "aave",
+    "cryptocurrency"
+  ],
+  "author": "Your Name",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.18.2",
+    "cors": "^2.8.5",
+    "helmet": "^7.0.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1"
+  },
+  "engines": {
+    "node": ">=16.0.0"
+  }
+}
