@@ -6,18 +6,24 @@ const helmet = require('helmet');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Security middleware
+// Security middleware - temporarily disabled for debugging
+// app.use(helmet({
+//     contentSecurityPolicy: {
+//         directives: {
+//             defaultSrc: ["'self'"],
+//             styleSrc: ["'self'", "'unsafe-inline'", "https://cdnjs.cloudflare.com"],
+//             fontSrc: ["'self'", "https://cdnjs.cloudflare.com"],
+//             scriptSrc: ["'self'", "'unsafe-inline'"],
+//             imgSrc: ["'self'", "data:", "https:"],
+//             connectSrc: ["'self'", "https://api.coingecko.com", "https://api.llama.fi", "https://api.etherscan.io"]
+//         }
+//     }
+// }));
+
+// Basic security headers without CSP
 app.use(helmet({
-    contentSecurityPolicy: {
-        directives: {
-            defaultSrc: ["'self'"],
-            styleSrc: ["'self'", "'unsafe-inline'", "https://cdnjs.cloudflare.com"],
-            fontSrc: ["'self'", "https://cdnjs.cloudflare.com"],
-            scriptSrc: ["'self'", "'unsafe-inline'"],
-            imgSrc: ["'self'", "data:", "https:"],
-            connectSrc: ["'self'", "https://api.coingecko.com", "https://api.llama.fi", "https://api.etherscan.io"]
-        }
-    }
+    contentSecurityPolicy: false,
+    crossOriginEmbedderPolicy: false
 }));
 
 // Enable CORS
@@ -28,6 +34,17 @@ app.use(express.json());
 
 // Serve static files
 app.use(express.static(path.join(__dirname)));
+
+// Ensure JavaScript files are served with correct headers
+app.get('*.js', (req, res, next) => {
+    res.setHeader('Content-Type', 'application/javascript');
+    next();
+});
+
+app.get('*.css', (req, res, next) => {
+    res.setHeader('Content-Type', 'text/css');
+    next();
+});
 
 // Routes
 app.get('/', (req, res) => {
@@ -46,6 +63,35 @@ app.get('/api/health', (req, res) => {
         service: 'DeFi Yield Calculator',
         version: '1.0.0'
     });
+});
+
+// Debug endpoint to check if files exist
+app.get('/api/debug/files', (req, res) => {
+    const fs = require('fs');
+    const files = [
+        'index.html',
+        'script.js',
+        'market-data.js',
+        'config.js'
+    ];
+    
+    const fileStatus = files.map(file => ({
+        file,
+        exists: fs.existsSync(path.join(__dirname, file)),
+        size: fs.existsSync(path.join(__dirname, file)) ? fs.statSync(path.join(__dirname, file)).size : 0
+    }));
+    
+    res.json({
+        files: fileStatus,
+        directory: __dirname,
+        timestamp: new Date().toISOString()
+    });
+});
+
+// Test endpoint for JavaScript files
+app.get('/api/test-js', (req, res) => {
+    res.setHeader('Content-Type', 'application/javascript');
+    res.send('console.log("JavaScript test endpoint working!");');
 });
 
 // API endpoint for market data (optional - can be used for caching)
