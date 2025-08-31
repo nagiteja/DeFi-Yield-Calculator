@@ -283,6 +283,9 @@
             <button class="tab-btn" onclick="showTab('il')">
                 <i class="fas fa-chart-area"></i> IL Simulator
             </button>
+            <button class="tab-btn" onclick="showTab('market')">
+                <i class="fas fa-chart-line"></i> Market Data
+            </button>
         </div>
 
         <!-- Yield Calculator Tab -->
@@ -328,6 +331,10 @@
 
             <button class="btn" onclick="calculateYield()">
                 <i class="fas fa-calculator"></i> Calculate Yield
+            </button>
+
+            <button class="btn" onclick="calculateYieldWithRealData()" style="background: linear-gradient(135deg, #51cf66 0%, #40c057 100%);">
+                <i class="fas fa-sync-alt"></i> Use Real-Time Data
             </button>
 
             <div id="yieldResults" class="results" style="display: none;">
@@ -442,8 +449,85 @@
                 </div>
             </div>
         </div>
+
+        <!-- Market Data Tab -->
+        <div id="market" class="tab-content">
+            <h2><i class="fas fa-chart-line"></i> Real-Time Market Data</h2>
+            
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="tokenSelect">Select Token</label>
+                    <select id="tokenSelect">
+                        <option value="ethereum">Ethereum (ETH)</option>
+                        <option value="bitcoin">Bitcoin (BTC)</option>
+                        <option value="usd-coin">USD Coin (USDC)</option>
+                        <option value="dai">Dai (DAI)</option>
+                        <option value="wrapped-bitcoin">Wrapped Bitcoin (WBTC)</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="protocolSelect">Select Protocol</label>
+                    <select id="protocolSelect">
+                        <option value="uniswap-v3">Uniswap V3</option>
+                        <option value="aave-v3">Aave V3</option>
+                        <option value="compound-v3">Compound V3</option>
+                        <option value="curve">Curve</option>
+                        <option value="balancer">Balancer</option>
+                    </select>
+                </div>
+            </div>
+
+            <button class="btn" onclick="loadMarketData()">
+                <i class="fas fa-sync-alt"></i> Load Market Data
+            </button>
+
+            <button class="btn" onclick="toggleAutoRefresh()" id="autoRefreshBtn">
+                <i class="fas fa-play"></i> Start Auto-Refresh
+            </button>
+
+            <div id="marketResults" class="results" style="display: none;">
+                <h3><i class="fas fa-chart-pie"></i> Market Data Results</h3>
+                
+                <div class="result-grid">
+                    <div class="result-item">
+                        <div class="value" id="tokenPrice">-</div>
+                        <div class="label">Token Price ($)</div>
+                    </div>
+                    <div class="result-item">
+                        <div class="value" id="priceChange24h">-</div>
+                        <div class="label">24h Change (%)</div>
+                    </div>
+                    <div class="result-item">
+                        <div class="value" id="protocolAPY">-</div>
+                        <div class="label">Protocol APY (%)</div>
+                    </div>
+                    <div class="result-item">
+                        <div class="value" id="protocolTVL">-</div>
+                        <div class="label">Protocol TVL ($)</div>
+                    </div>
+                    <div class="result-item">
+                        <div class="value" id="gasPrice">-</div>
+                        <div class="label">Gas Price (Gwei)</div>
+                    </div>
+                    <div class="result-item">
+                        <div class="value" id="lastUpdated">-</div>
+                        <div class="label">Last Updated</div>
+                    </div>
+                </div>
+
+                <div style="margin-top: 30px;">
+                    <h4><i class="fas fa-list"></i> Top Yield Opportunities</h4>
+                    <div id="yieldOpportunities" style="margin-top: 15px;">
+                        <p>Click "Load Market Data" to see current yield opportunities</p>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 
+    <script src="config.js"></script>
+    <script src="market-data.js"></script>
     <script src="script.js"></script>
 </body>
 </html>

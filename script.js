@@ -355,13 +355,195 @@ function formatPercentage(value) {
 function loadSampleData() {
     // This could be used to load real market data in the future
     console.log('DeFi Yield Calculator loaded successfully!');
+    
+    // Test MarketDataManager availability
+    setTimeout(() => {
+        if (typeof MarketDataManager !== 'undefined') {
+            console.log('✅ MarketDataManager class is available');
+            console.log('MarketDataManager prototype:', MarketDataManager.prototype);
+        } else {
+            console.error('❌ MarketDataManager class is NOT available');
+            console.log('Window objects containing "Market":', Object.keys(window).filter(key => key.includes('Market')));
+        }
+    }, 1000);
 }
+
+// Market Data Integration
+let marketDataManager;
+let autoRefreshActive = false;
 
 // Initialize the application
 document.addEventListener('DOMContentLoaded', function() {
     loadSampleData();
     
+    // Initialize market data manager with error handling
+    try {
+        if (typeof MarketDataManager !== 'undefined') {
+            marketDataManager = new MarketDataManager();
+            console.log('✅ Market Data Manager initialized successfully');
+        } else {
+            console.error('❌ MarketDataManager class not found');
+            console.log('Available global objects:', Object.keys(window).filter(key => key.includes('Market')));
+        }
+    } catch (error) {
+        console.error('❌ Failed to initialize Market Data Manager:', error);
+    }
+    
     // Add some helpful tooltips or info
     console.log('💡 Tip: Use the Yield Calculator to estimate returns from Uniswap LP + Aave staking');
     console.log('💡 Tip: Use the IL Simulator to understand impermanent loss risks at different price levels');
+    console.log('💡 Tip: Use the Market Data tab to get real-time DeFi rates and prices');
 });
+
+// Market Data Functions
+async function loadMarketData() {
+    // Try to initialize if not already done
+    if (!marketDataManager) {
+        try {
+            if (typeof MarketDataManager !== 'undefined') {
+                marketDataManager = new MarketDataManager();
+                console.log('✅ Market Data Manager initialized on demand');
+            } else {
+                throw new Error('MarketDataManager class not available');
+            }
+        } catch (error) {
+            console.error('❌ Failed to initialize Market Data Manager:', error);
+            alert('Market data manager not available. Please refresh the page and try again.');
+            return;
+        }
+    }
+
+    try {
+        // Show loading state
+        const btn = document.querySelector('button[onclick="loadMarketData()"]');
+        const originalText = btn.innerHTML;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Loading...';
+        btn.disabled = true;
+
+        // Get selected token and protocol
+        const selectedToken = document.getElementById('tokenSelect').value;
+        const selectedProtocol = document.getElementById('protocolSelect').value;
+
+        // Load data
+        const tokenData = await marketDataManager.getTokenPrice(selectedToken);
+        const protocolData = await marketDataManager.getProtocolData(selectedProtocol);
+        const gasPrices = await marketDataManager.getGasPrices();
+        const yieldOpportunities = await marketDataManager.getYieldFarmingOpportunities();
+
+        // Display results
+        displayMarketData(tokenData, protocolData, gasPrices, yieldOpportunities);
+
+        // Reset button
+        btn.innerHTML = originalText;
+        btn.disabled = false;
+
+    } catch (error) {
+        console.error('Failed to load market data:', error);
+        alert('Failed to load market data. Please try again.');
+        
+        // Reset button
+        const btn = document.querySelector('button[onclick="loadMarketData()"]');
+        btn.innerHTML = '<i class="fas fa-sync-alt"></i> Load Market Data';
+        btn.disabled = false;
+    }
+}
+
+function displayMarketData(tokenData, protocolData, gasPrices, yieldOpportunities) {
+    if (tokenData) {
+        document.getElementById('tokenPrice').textContent = '$' + tokenData.price.toFixed(2);
+        document.getElementById('priceChange24h').textContent = tokenData.change24h.toFixed(2) + '%';
+    }
+
+    if (protocolData) {
+        document.getElementById('protocolAPY').textContent = (protocolData.apy || 0).toFixed(2) + '%';
+        document.getElementById('protocolTVL').textContent = '$' + (protocolData.tvl / 1e9).toFixed(2) + 'B';
+    }
+
+    if (gasPrices) {
+        document.getElementById('gasPrice').textContent = gasPrices.standard + ' Gwei';
+    }
+
+    document.getElementById('lastUpdated').textContent = new Date().toLocaleTimeString();
+
+    // Display yield opportunities
+    if (yieldOpportunities && yieldOpportunities.length > 0) {
+        let opportunitiesHTML = '<div style="max-height: 300px; overflow-y: auto;">';
+        yieldOpportunities.slice(0, 10).forEach(opp => {
+            opportunitiesHTML += `
+                <div style="display: flex; justify-content: space-between; padding: 10px; background: white; margin: 5px 0; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
+                    <span><strong>${opp.project}</strong></span>
+                    <span style="color: #667eea; font-weight: 600;">${opp.apy.toFixed(2)}% APY</span>
+                </div>
+            `;
+        });
+        opportunitiesHTML += '</div>';
+        document.getElementById('yieldOpportunities').innerHTML = opportunitiesHTML;
+    }
+
+    document.getElementById('marketResults').style.display = 'block';
+}
+
+function toggleAutoRefresh() {
+    const btn = document.getElementById('autoRefreshBtn');
+    
+    if (!autoRefreshActive) {
+        // Start auto-refresh
+        marketDataManager.startAutoRefresh((data) => {
+            // Update UI with new data
+            if (data.prices && data.prices.ethereum) {
+                document.getElementById('tokenPrice').textContent = '$' + data.prices.ethereum.usd.toFixed(2);
+                document.getElementById('priceChange24h').textContent = data.prices.ethereum.usd_24h_change.toFixed(2) + '%';
+            }
+            if (data.gasPrices) {
+                document.getElementById('gasPrice').textContent = data.gasPrices.standard + ' Gwei';
+            }
+            document.getElementById('lastUpdated').textContent = new Date().toLocaleTimeString();
+        });
+        
+        btn.innerHTML = '<i class="fas fa-pause"></i> Stop Auto-Refresh';
+        btn.style.background = 'linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%)';
+        autoRefreshActive = true;
+    } else {
+        // Stop auto-refresh
+        marketDataManager.stopAutoRefresh();
+        
+        btn.innerHTML = '<i class="fas fa-play"></i> Start Auto-Refresh';
+        btn.style.background = 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)';
+        autoRefreshActive = false;
+    }
+}
+
+// Enhanced yield calculator with real-time data
+async function calculateYieldWithRealData() {
+    if (!marketDataManager) {
+        calculateYield(); // Fall back to manual input
+        return;
+    }
+
+    try {
+        // Get real-time yields
+        const realYields = await marketDataManager.getRealTimeYields();
+        
+        // Update form with real data if available
+        if (realYields['uniswap-v3']) {
+            document.getElementById('uniswapAPR').value = realYields['uniswap-v3'].apy.toFixed(2);
+        }
+        if (realYields['aave-v3']) {
+            document.getElementById('aaveAPR').value = realYields['aave-v3'].apy.toFixed(2);
+        }
+
+        // Get real-time gas prices for fee calculation
+        const gasPrices = await marketDataManager.getGasPrices();
+        if (gasPrices) {
+            const gasCosts = marketDataManager.calculateGasCosts(gasPrices, 'standard');
+            document.getElementById('gasFees').value = parseFloat(gasCosts.addLiquidity) + parseFloat(gasCosts.stake);
+        }
+
+        // Calculate yield with updated values
+        calculateYield();
+        
+    } catch (error) {
+        console.error('Failed to get real-time data:', error);
+        calculateYield(); // Fall back to manual input
+    }
+}
